@@ -1,0 +1,67 @@
+CREATE DATABASE car_rental_db;
+USE car_rental_db;
+
+-- 1. User Table (FR1)
+CREATE TABLE Users (
+    id VARCHAR(50) PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
+    firstName VARCHAR(50),
+    lastName VARCHAR(50),
+    driverLicense VARCHAR(50),
+    phone VARCHAR(20),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    isAdmin BOOLEAN DEFAULT FALSE
+);
+
+-- 2. Vehicle Table (FR2)
+CREATE TABLE Vehicles (
+    id VARCHAR(50) PRIMARY KEY,
+    make VARCHAR(50),
+    model VARCHAR(50),
+    year INT,
+    category ENUM('sedan', 'SUV', 'economy'),
+    transmission VARCHAR(20),
+    fuelType VARCHAR(20),
+    seats INT,
+    dailyRate DECIMAL(10, 2),
+    status VARCHAR(20) DEFAULT 'available',
+    imageUrl VARCHAR(255)
+);
+
+-- 3. Booking Table (FR3)
+CREATE TABLE Bookings (
+    id VARCHAR(50) PRIMARY KEY,
+    userId VARCHAR(50),
+    vehicleId VARCHAR(50),
+    startDate DATE,
+    endDate DATE,
+    totalAmount DECIMAL(10, 2),
+    status VARCHAR(20) DEFAULT 'pending',
+    confirmationNumber VARCHAR(100),
+    bookedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(id),
+    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
+);
+
+-- 4. Payment Table (FR4)
+CREATE TABLE Payments (
+    id VARCHAR(50) PRIMARY KEY,
+    bookingId VARCHAR(50),
+    amount DECIMAL(10, 2),
+    method VARCHAR(50),
+    transactionId VARCHAR(100),
+    status VARCHAR(20),
+    processedAt DATETIME,
+    FOREIGN KEY (bookingId) REFERENCES Bookings(id)
+);
+
+-- 5. AdminLog Table (FR5)
+CREATE TABLE AdminLogs (
+    id VARCHAR(50) PRIMARY KEY,
+    adminId VARCHAR(50),
+    action VARCHAR(100),
+    details JSON,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (adminId) REFERENCES Users(id)
+);
