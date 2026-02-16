@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// La URL base apunta a tu servidor de Node.js (Semana 3 Setup)
+// The base URL points to your Node.js server (Week 3 Setup)
 const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
@@ -10,7 +10,7 @@ const api = axios.create({
     }
 });
 
-// --- Servicios de Vehículos (FR2 & FR3) ---
+// --- Vehicle Services (FR2 and FR3) ---
 export const getVehicles = () => api.get('/cars');
 export const getVehiclesByCategory = (category) => api.get(`/cars/category/${category}`);
 export const checkVehicleStatus = (id) => api.get(`/cars/status/${id}`);

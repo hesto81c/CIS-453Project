@@ -5,20 +5,20 @@ exports.createBooking = async (req, res) => {
     const { userId, vehicleId, startDate, endDate, dailyRate } = req.body;
 
     try {
-        // 1. Verificar disponibilidad nuevamente por seguridad (FR3)
+        // 1. Verify availability again for security (FR3)
         const isAvailable = await Vehicle.checkAvailability(vehicleId);
         if (!isAvailable) {
             return res.status(400).json({ message: "Vehicle is no longer available" });
         }
 
-        // 2. Calcular el costo total (Diferencia de días * tarifa diaria)
+        // 2. Calculate the total cost (Difference in days * daily rate)
         const start = new Date(startDate);
         const end = new Date(endDate);
         const diffTime = Math.abs(end - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         const totalCost = diffDays * dailyRate;
 
-        // 3. Crear la reserva en la base de datos (FR3)
+        // 3. Create the reservation in the database (FR3)
         const bookingId = Date.now(); // Generador de ID temporal
         await Booking.create({
             id: bookingId,
@@ -29,7 +29,7 @@ exports.createBooking = async (req, res) => {
             totalCost
         });
 
-        // 4. Actualizar el estado del vehículo a 'rented' (FR5)
+        // 4. Update vehicle status to 'rented' (FR5)
         await Vehicle.updateStatus(vehicleId, 'rented');
 
         res.status(201).json({ 
