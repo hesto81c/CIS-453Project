@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// The base URL points to your Node.js server (Week 3 Setup)
 const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
@@ -11,12 +10,14 @@ const api = axios.create({
 });
 
 // --- Vehicle Services (FR2 and FR3) ---
-export const getVehicles = () => api.get('/cars');
+// Make sure the backend uses the /api/cars route
+export const getVehicles = () => api.get('/cars'); 
 export const getVehiclesByCategory = (category) => api.get(`/cars/category/${category}`);
 export const checkVehicleStatus = (id) => api.get(`/cars/status/${id}`);
 
-// --- Servicios de Reservas (FR3) ---
-export const createBooking = (bookingData) => api.get('/bookings', bookingData);
+// --- Reservation Services (FR3) ---
+// IMPORTANT CHANGE: We use .post to send data to the server
+export const createBooking = (bookingData) => api.post('/bookings', bookingData); 
 export const getUserHistory = (userId) => api.get(`/bookings/user/${userId}`);
 
 export default api;

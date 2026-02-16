@@ -6,7 +6,6 @@ const Catalog = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // API call on page load (FR2)
         const fetchCars = async () => {
             try {
                 const response = await getVehicles();
@@ -24,15 +23,15 @@ const Catalog = () => {
 
     return (
         <div className="catalog-container">
-            <h1>Explora nuestra flota</h1>
-            <div className="car-grid">
+            <h1>Explore Our Fleet</h1>
+            <div className="car-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
                 {cars.map(car => (
-                    <div key={car.id} className="car-card">
+                    <div key={car.id} className="car-card" style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
                         <h3>{car.make} {car.model}</h3>
-                        <p>Categoría: {car.category}</p>
-                        <p>Precio por día: ${car.dailyRate}</p>
+                        <p>Category: {car.category}</p>
+                        <p>Daily Rate: ${car.dailyRate}</p>
                         <button disabled={car.status !== 'available'}>
-                            {car.status === 'available' ? 'Reservar ahora' : 'No disponible'}
+                            {car.status === 'available' ? 'Book Now' : 'Not Available'}
                         </button>
                     </div>
                 ))}
