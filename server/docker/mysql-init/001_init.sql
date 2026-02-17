@@ -1,0 +1,15 @@
+﻿USE car_rental_db;
+
+CREATE TABLE IF NOT EXISTS Users (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(255) NOT NULL,
+  passwordHash VARCHAR(255) NOT NULL,
+  firstName VARCHAR(100) NULL,
+  lastName VARCHAR(100) NULL,
+  driverLicense VARCHAR(100) NULL,
+  phone VARCHAR(50) NULL,
+  isAdmin TINYINT(1) NOT NULL DEFAULT 0,
+  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_users_email (email)
+);
