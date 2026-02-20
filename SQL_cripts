@@ -44,8 +44,7 @@ CREATE TABLE Vehicles (
     plateNumber VARCHAR(20) UNIQUE NOT NULL,
     mileage INT DEFAULT 0,
     dailyRate DECIMAL(10,2) NOT NULL CHECK (dailyRate > 0),
-    status ENUM('available', 'reserved', 'rented', 'maintenance', 'inactive') 
-        DEFAULT 'available',
+    status ENUM('available', 'reserved', 'rented', 'maintenance', 'inactive') DEFAULT 'available',
     locationId VARCHAR(50),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (locationId) REFERENCES Locations(id)
@@ -57,15 +56,27 @@ CREATE TABLE VehicleImages (
     id VARCHAR(50) PRIMARY KEY,
     vehicleId VARCHAR(50) NOT NULL,
     imageUrl VARCHAR(255) NOT NULL,
+    isPrimary BOOLEAN DEFAULT FALSE,          -- Marks the main display image
     FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
 );
 
--- 5. Bookings Table
+-- 5. Insurance Plans Table (NEW)
+
+CREATE TABLE InsurancePlans (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,               -- e.g. 'Basic', 'Standard', 'Full Coverage'
+    description TEXT,
+    dailyRate DECIMAL(10,2) NOT NULL CHECK (dailyRate >= 0),
+    coverageDetails TEXT                      -- Summary of what is covered
+);
+
+-- 7. Bookings Table
 
 CREATE TABLE Bookings (
     id VARCHAR(50) PRIMARY KEY,
     userId VARCHAR(50) NOT NULL,
     vehicleId VARCHAR(50) NOT NULL,
+    insurancePlanId VARCHAR(50),              -- Optional insurance plan chosen
     pickupLocationId VARCHAR(50),
     dropoffLocationId VARCHAR(50),
     startDate DATE NOT NULL,
@@ -73,19 +84,20 @@ CREATE TABLE Bookings (
     pickupTime TIME,
     dropoffTime TIME,
     totalAmount DECIMAL(10,2) NOT NULL CHECK (totalAmount >= 0),
-    status ENUM('pending', 'confirmed', 'active', 'completed', 'cancelled') 
-        DEFAULT 'pending',
+    status ENUM('pending', 'confirmed', 'active', 'completed', 'cancelled') DEFAULT 'pending',
     confirmationNumber VARCHAR(100) UNIQUE,
+    notes TEXT,                               -- Optional customer notes or special requests
     bookedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     cancelledAt DATETIME,
     FOREIGN KEY (userId) REFERENCES Users(id),
     FOREIGN KEY (vehicleId) REFERENCES Vehicles(id),
+    FOREIGN KEY (insurancePlanId) REFERENCES InsurancePlans(id),
     FOREIGN KEY (pickupLocationId) REFERENCES Locations(id),
     FOREIGN KEY (dropoffLocationId) REFERENCES Locations(id),
     CHECK (endDate >= startDate)
 );
 
--- 6. Payments Table
+-- 8. Payments Table
 
 CREATE TABLE Payments (
     id VARCHAR(50) PRIMARY KEY,
@@ -99,7 +111,7 @@ CREATE TABLE Payments (
     FOREIGN KEY (bookingId) REFERENCES Bookings(id)
 );
 
--- 7. Maintenance Records Table
+-- 9. Maintenance Records Table
 
 CREATE TABLE MaintenanceRecords (
     id VARCHAR(50) PRIMARY KEY,
@@ -111,20 +123,22 @@ CREATE TABLE MaintenanceRecords (
     FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
 );
 
--- 8. Reviews Table
+-- 10. Reviews Table
 
 CREATE TABLE Reviews (
     id VARCHAR(50) PRIMARY KEY,
     userId VARCHAR(50) NOT NULL,
     vehicleId VARCHAR(50) NOT NULL,
+    bookingId VARCHAR(50) NOT NULL,           -- Ensures review is tied to a real rental
     rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES Users(id),
-    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
+    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id),
+    FOREIGN KEY (bookingId) REFERENCES Bookings(id)
 );
 
--- 9. Admin Logs Table
+-- 11. Admin Logs Table
 
 CREATE TABLE AdminLogs (
     id VARCHAR(50) PRIMARY KEY,
@@ -140,5 +154,8 @@ CREATE TABLE AdminLogs (
 
 CREATE INDEX idx_booking_user ON Bookings(userId);
 CREATE INDEX idx_booking_vehicle ON Bookings(vehicleId);
+CREATE INDEX idx_booking_status ON Bookings(status);
 CREATE INDEX idx_vehicle_status ON Vehicles(status);
+CREATE INDEX idx_vehicle_location ON Vehicles(locationId);
 CREATE INDEX idx_payment_booking ON Payments(bookingId);
+CREATE INDEX idx_review_vehicle ON Reviews(vehicleId);
