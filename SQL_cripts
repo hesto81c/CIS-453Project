@@ -1,67 +1,144 @@
 CREATE DATABASE car_rental_db;
 USE car_rental_db;
 
--- 1. User Table (FR1)
+-- 1. Users Table
+
 CREATE TABLE Users (
     id VARCHAR(50) PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
-    firstName VARCHAR(50),
-    lastName VARCHAR(50),
-    driverLicense VARCHAR(50),
+    firstName VARCHAR(50) NOT NULL,
+    lastName VARCHAR(50) NOT NULL,
+    driverLicense VARCHAR(50) UNIQUE,
+    licenseExpiration DATE,
     phone VARCHAR(20),
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    isAdmin BOOLEAN DEFAULT FALSE
+    dateOfBirth DATE,
+    isVerified BOOLEAN DEFAULT FALSE,
+    isAdmin BOOLEAN DEFAULT FALSE,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Vehicle Table (FR2)
+-- 2. Locations Table
+
+CREATE TABLE Locations (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    phone VARCHAR(20)
+);
+
+-- 3. Vehicles Table
+
 CREATE TABLE Vehicles (
     id VARCHAR(50) PRIMARY KEY,
-    make VARCHAR(50),
-    model VARCHAR(50),
-    year INT,
-    category ENUM('sedan', 'SUV', 'economy'),
-    transmission VARCHAR(20),
-    fuelType VARCHAR(20),
-    seats INT,
-    dailyRate DECIMAL(10, 2),
-    status VARCHAR(20) DEFAULT 'available',
-    imageUrl VARCHAR(255)
+    make VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    year INT NOT NULL,
+    category ENUM('sedan', 'SUV', 'economy', 'luxury') NOT NULL,
+    transmission ENUM('automatic', 'manual') NOT NULL,
+    fuelType ENUM('gasoline', 'diesel', 'electric', 'hybrid') NOT NULL,
+    seats INT NOT NULL,
+    color VARCHAR(30),
+    plateNumber VARCHAR(20) UNIQUE NOT NULL,
+    mileage INT DEFAULT 0,
+    dailyRate DECIMAL(10,2) NOT NULL CHECK (dailyRate > 0),
+    status ENUM('available', 'reserved', 'rented', 'maintenance', 'inactive') 
+        DEFAULT 'available',
+    locationId VARCHAR(50),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (locationId) REFERENCES Locations(id)
 );
 
--- 3. Booking Table (FR3)
-CREATE TABLE Bookings (
+-- 4. Vehicle Images Table
+
+CREATE TABLE VehicleImages (
     id VARCHAR(50) PRIMARY KEY,
-    userId VARCHAR(50),
-    vehicleId VARCHAR(50),
-    startDate DATE,
-    endDate DATE,
-    totalAmount DECIMAL(10, 2),
-    status VARCHAR(20) DEFAULT 'pending',
-    confirmationNumber VARCHAR(100),
-    bookedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES Users(id),
+    vehicleId VARCHAR(50) NOT NULL,
+    imageUrl VARCHAR(255) NOT NULL,
     FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
 );
 
--- 4. Payment Table (FR4)
+-- 5. Bookings Table
+
+CREATE TABLE Bookings (
+    id VARCHAR(50) PRIMARY KEY,
+    userId VARCHAR(50) NOT NULL,
+    vehicleId VARCHAR(50) NOT NULL,
+    pickupLocationId VARCHAR(50),
+    dropoffLocationId VARCHAR(50),
+    startDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    pickupTime TIME,
+    dropoffTime TIME,
+    totalAmount DECIMAL(10,2) NOT NULL CHECK (totalAmount >= 0),
+    status ENUM('pending', 'confirmed', 'active', 'completed', 'cancelled') 
+        DEFAULT 'pending',
+    confirmationNumber VARCHAR(100) UNIQUE,
+    bookedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    cancelledAt DATETIME,
+    FOREIGN KEY (userId) REFERENCES Users(id),
+    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id),
+    FOREIGN KEY (pickupLocationId) REFERENCES Locations(id),
+    FOREIGN KEY (dropoffLocationId) REFERENCES Locations(id),
+    CHECK (endDate >= startDate)
+);
+
+-- 6. Payments Table
+
 CREATE TABLE Payments (
     id VARCHAR(50) PRIMARY KEY,
-    bookingId VARCHAR(50),
-    amount DECIMAL(10, 2),
-    method VARCHAR(50),
-    transactionId VARCHAR(100),
-    status VARCHAR(20),
+    bookingId VARCHAR(50) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
+    currency VARCHAR(10) DEFAULT 'USD',
+    method ENUM('credit_card', 'debit_card', 'paypal', 'cash') NOT NULL,
+    transactionId VARCHAR(100) UNIQUE,
+    status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
     processedAt DATETIME,
     FOREIGN KEY (bookingId) REFERENCES Bookings(id)
 );
 
--- 5. AdminLog Table (FR5)
+-- 7. Maintenance Records Table
+
+CREATE TABLE MaintenanceRecords (
+    id VARCHAR(50) PRIMARY KEY,
+    vehicleId VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    cost DECIMAL(10,2),
+    performedAt DATETIME NOT NULL,
+    nextServiceDate DATE,
+    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
+);
+
+-- 8. Reviews Table
+
+CREATE TABLE Reviews (
+    id VARCHAR(50) PRIMARY KEY,
+    userId VARCHAR(50) NOT NULL,
+    vehicleId VARCHAR(50) NOT NULL,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(id),
+    FOREIGN KEY (vehicleId) REFERENCES Vehicles(id)
+);
+
+-- 9. Admin Logs Table
+
 CREATE TABLE AdminLogs (
     id VARCHAR(50) PRIMARY KEY,
-    adminId VARCHAR(50),
-    action VARCHAR(100),
+    adminId VARCHAR(50) NOT NULL,
+    action VARCHAR(100) NOT NULL,
     details JSON,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ipAddress VARCHAR(50),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (adminId) REFERENCES Users(id)
 );
+
+-- Indexes for Performance
+
+CREATE INDEX idx_booking_user ON Bookings(userId);
+CREATE INDEX idx_booking_vehicle ON Bookings(vehicleId);
+CREATE INDEX idx_vehicle_status ON Vehicles(status);
+CREATE INDEX idx_payment_booking ON Payments(bookingId);
