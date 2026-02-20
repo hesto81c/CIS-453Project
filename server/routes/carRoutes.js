@@ -1,17 +1,22 @@
+// server/routes/carRoutes.js
 const express = require('express');
 const router = express.Router();
-const carController = require('../controllers/CarController');
+const db = require('../db');
 
-// Route to get all the cars (FR2)
-// GET /api/cars
-router.get('/', carController.getCars);
-
-// Route to filter by category (FR2)
-// GET /api/cars/category/:category
-router.get('/category/:category', carController.getCarsByCategory);
-
-// Route to check availability of a specific car (FR3)
-// GET /api/cars/status/:id
-router.get('/status/:id', carController.checkCarStatus);
+router.get('/', async (req, res) => {
+    try {
+        // SQL Join to get the car info + its primary image
+        const [rows] = await db.execute(`
+            SELECT v.id, v.make, v.model, v.dailyRate, v.transmission, v.fuelType, v.category, i.imageUrl
+            FROM Vehicles v
+            LEFT JOIN VehicleImages i ON v.id = i.vehicleId
+            WHERE i.isPrimary = TRUE OR i.isPrimary IS NULL
+        `);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Error fetching fleet:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;

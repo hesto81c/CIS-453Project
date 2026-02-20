@@ -1,0 +1,153 @@
+/* client/src/styles/Catalog.css */
+
+/* Main Container */
+.slider-container {
+    width: 100%;
+    height: 85vh;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Badge at the top */
+.now-showing {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    color: #9fff6b; /* Neon Green Branding */
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.now-showing::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #9fff6b;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #9fff6b;
+}
+
+/* Accordion Flex Logic */
+.accordion-slider {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.slide {
+    flex: 1;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Dark overlay for text readability */
+.slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 100%);
+    z-index: 1;
+}
+
+/* Expansion state */
+.slide.active {
+    flex: 5;
+    cursor: default;
+}
+
+/* Content inside each slide */
+.slide-content {
+    position: absolute;
+    bottom: 60px;
+    left: 50px;
+    right: 50px;
+    z-index: 5;
+    color: #ffffff;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease 0.4s;
+}
+
+.slide.active .slide-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.slide-number {
+    font-size: 18px;
+    color: #9fff6b;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.car-brand {
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+}
+
+.car-name {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 25px;
+}
+
+/* Specifications Grid */
+.car-specs {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.spec-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.spec-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+}
+
+.spec-value {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* Booking Button */
+.rent-btn {
+    padding: 18px 45px;
+    background: #9fff6b;
+    color: #000;
+    border: none;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 10px 20px rgba(159, 255, 107, 0.2);
+}
+
+.rent-btn:hover {
+    background: #ffffff;
+    transform: scale(1.05);
+}

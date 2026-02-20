@@ -1,38 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { getVehicles } from '../services/api';
+// client/src/pages/Catalog.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import '../styles/Catalog.css'; // Here goes your style.css
 
 const Catalog = () => {
-    const [cars, setCars] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [vehicles, setVehicles] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0); // Controls which slide is expanded
 
     useEffect(() => {
-        const fetchCars = async () => {
-            try {
-                const response = await getVehicles();
-                setCars(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching cars:", error);
-                setLoading(false);
-            }
-        };
-        fetchCars();
+        // Fetch real data from the backend
+        axios.get('http://localhost:5000/api/cars')
+            .then(res => setVehicles(res.data))
+            .catch(err => console.error("API Error:", err));
     }, []);
 
-    if (loading) return <p>Loading catalog...</p>;
-
     return (
-        <div className="catalog-container">
-            <h1>Explore Our Fleet</h1>
-            <div className="car-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
-                {cars.map(car => (
-                    <div key={car.id} className="car-card" style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
-                        <h3>{car.make} {car.model}</h3>
-                        <p>Category: {car.category}</p>
-                        <p>Daily Rate: ${car.dailyRate}</p>
-                        <button disabled={car.status !== 'available'}>
-                            {car.status === 'available' ? 'Book Now' : 'Not Available'}
-                        </button>
+        <div className="slider-container">
+            <div className="now-showing">Rental10 Showroom</div>
+            <div className="accordion-slider">
+                {vehicles.map((car, index) => (
+                    <div 
+                        key={car.id}
+                        className={`slide ${activeIndex === index ? 'active' : ''}`}
+                        style={{ backgroundImage: `url(${car.imageUrl})` }}
+                        onClick={() => setActiveIndex(index)}
+                    >
+                        <div className="slide-content">
+                            <div className="slide-number">0{index + 1}</div>
+                            <div className="car-brand">{car.make}</div>
+                            <div className="car-name">{car.model}</div>
+                            
+                            <div className="car-specs">
+                                <div className="spec-row">
+                                    <span className="spec-label">Daily Price:</span>
+                                    <span className="spec-value">${car.dailyRate} USD</span>
+                                </div>
+                                <div className="spec-row">
+                                    <span className="spec-label">Transmission:</span>
+                                    <span className="spec-value">{car.transmission}</span>
+                                </div>
+                            </div>
+
+                            <button className="rent-btn" onClick={() => window.location.href=`/booking/${car.id}`}>
+                                RENT NOW
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
