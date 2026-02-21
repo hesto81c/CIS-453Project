@@ -1,13 +1,13 @@
+require('dotenv').config(); // 1. SIEMPRE en la primera línea para que las rutas vean las variables
 const express = require('express');
-const cors = require('cors'); // Required to allow React to talk to this server
+const cors = require('cors'); 
 const carRoutes = require('./routes/carRoutes');
-require('dotenv').config();
 
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(cors()); // Enables Cross-Origin Resource Sharing (Fixes the "Black Screen" issue)
-app.use(express.json()); // Allows the server to parse JSON data
+app.use(cors()); 
+app.use(express.json()); 
 
 // --- ROUTES ---
 // Mount the car routes at /api/cars
@@ -18,4 +18,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`🚗 Fleet API available at http://localhost:${PORT}/api/cars`);
+    console.log(`🔑 JWT Secret loaded: ${process.env.JWT_SECRET ? 'Yes' : 'No'}`); // Verificación rápida
 });
