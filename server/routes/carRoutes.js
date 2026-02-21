@@ -1,21 +1,22 @@
 // server/routes/carRoutes.js
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+
+// Using the explicit extension .js helps Node find the file sometimes
+const db = require('../db.js'); 
 
 router.get('/', async (req, res) => {
     try {
-        // SQL Join to get the car info + its primary image
         const [rows] = await db.execute(`
-            SELECT v.id, v.make, v.model, v.dailyRate, v.transmission, v.fuelType, v.category, i.imageUrl
+            SELECT v.id, v.make, v.model, v.dailyRate, i.imageUrl
             FROM Vehicles v
             LEFT JOIN VehicleImages i ON v.id = i.vehicleId
-            WHERE i.isPrimary = TRUE OR i.isPrimary IS NULL
         `);
+        console.log("Cars found in DB:", rows.length);
         res.status(200).json(rows);
     } catch (error) {
-        console.error('Error fetching fleet:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('SERVER ERROR:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
