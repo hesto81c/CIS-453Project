@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Catalog from './pages/Catalog';
-import CarDetails from './pages/CarDetails'; // Added Import
+import CarDetails from './pages/CarDetails';
+import Booking from './pages/Booking'; // NEW
 
 function App() {
   const handleLogout = () => {
@@ -50,11 +51,12 @@ function App() {
 
         <main style={{ minHeight: 'calc(100vh - 70px)', backgroundColor: '#000' }}>
           <Routes>
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Login />} />
-            <Route path="/details/:id" element={<CarDetails />} /> {/* Added Route */}
-            <Route path="/" element={<Catalog />} />
+            <Route path="/catalog"      element={<Catalog />} />
+            <Route path="/login"        element={<Login />} />
+            <Route path="/register"     element={<Login />} />
+            <Route path="/details/:id"  element={<CarDetails />} />
+            <Route path="/booking/:id"  element={<Booking />} />  {/* NEW */}
+            <Route path="/"             element={<Catalog />} />
           </Routes>
         </main>
       </div>
