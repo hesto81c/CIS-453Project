@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -22,9 +23,10 @@ const CarDetails = () => {
       });
   }, [id]);
 
+  // Always go to catalog — details is opened in a new tab from fleet
   const handleBack = () => {
     if (window.history.length > 1) {
-      navigate(-1);
+      navigate('/catalog');
     } else {
       window.close();
     }
@@ -159,7 +161,7 @@ const CarDetails = () => {
               cursor: isAvailable ? 'pointer' : 'not-allowed',
             }}
             disabled={!isAvailable}
-            onClick={() => isAvailable && navigate(`/booking/${car.id}`)}
+            onClick={() => isAvailable && navigate(`/booking/${car.id}?from=details`)}
           >
             {isAvailable ? 'BOOK NOW' : `UNAVAILABLE · ${car.status?.toUpperCase()}`}
           </button>

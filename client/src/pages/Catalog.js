@@ -65,7 +65,7 @@ const Catalog = () => {
                                     className="rent-btn"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        window.location.href = `/booking/${car.id || car._id}`;
+                                        window.location.href = `/booking/${car.id || car._id}?from=catalog`;
                                     }}
                                 >
                                     RENT NOW
