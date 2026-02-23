@@ -16,7 +16,7 @@ const getCardBrand = (num) => {
   if (/^5[1-5]/.test(n))      return { brand:'MASTERCARD', color:'#eb001b' };
   if (/^3[47]/.test(n))       return { brand:'AMEX',       color:'#2e77bc' };
   if (/^6(?:011|5)/.test(n))  return { brand:'DISCOVER',   color:'#f76f20' };
-  return { brand:'', color:'#2a2a3a' };
+  return { brand:'', color:'#1e1e2e' };
 };
 
 // ── Animated Credit Card Preview ──
@@ -34,7 +34,7 @@ const CardPreview = ({ number, name, expiry, isFlipped }) => {
         {/* Front */}
         <div style={{
           position:'absolute', inset:0, backfaceVisibility:'hidden',
-          background:`linear-gradient(135deg, #1a1a24 0%, ${color}88 100%)`,
+          background:`linear-gradient(135deg, #13131c 0%, ${color}88 100%)`,
           borderRadius:'18px', padding:'28px',
           border:'1px solid #3a3a4a',
           boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
@@ -72,7 +72,7 @@ const CardPreview = ({ number, name, expiry, isFlipped }) => {
         <div style={{
           position:'absolute', inset:0, backfaceVisibility:'hidden',
           transform:'rotateY(180deg)',
-          background:'linear-gradient(135deg,#1a1a24,#2a2a34)',
+          background:'linear-gradient(135deg,#13131c,#2a2a34)',
           borderRadius:'18px', border:'1px solid #3a3a4a',
           boxShadow:'0 20px 60px rgba(0,0,0,0.5)',
           overflow:'hidden',
@@ -174,22 +174,22 @@ const Payment = () => {
     <div style={S.wrapper}>
       <div style={S.successBox}>
         <div style={{ fontSize:'5rem', marginBottom:'16px', animation:'pop .4s ease' }}>✅</div>
-        <h2 style={{ color:'#4ade80', fontFamily:'serif', fontSize:'2.2rem', margin:'0 0 8px' }}>
+        <h2 style={{ color:'#c8cdd6', fontFamily:'serif', fontSize:'2.2rem', margin:'0 0 8px' }}>
           Payment Successful!
         </h2>
-        <p style={{ color:'#7a7a9a', marginBottom:'24px' }}>Your booking is now confirmed.</p>
+        <p style={{ color:'#6a7080', marginBottom:'24px' }}>Your booking is now confirmed.</p>
         <div style={S.confirmBox}>
           <div style={S.confirmRow}>
-            <span style={{ color:'#7a7a9a', fontSize:'.75rem', letterSpacing:'1px' }}>CONFIRMATION</span>
-            <span style={{ color:'#e46033', fontWeight:700, letterSpacing:'2px' }}>{booking?.confirmationNumber}</span>
+            <span style={{ color:'#6a7080', fontSize:'.75rem', letterSpacing:'1px' }}>CONFIRMATION</span>
+            <span style={{ color:'#9b1c31', fontWeight:700, letterSpacing:'2px' }}>{booking?.confirmationNumber}</span>
           </div>
           <div style={S.confirmRow}>
-            <span style={{ color:'#7a7a9a', fontSize:'.75rem', letterSpacing:'1px' }}>TRANSACTION</span>
-            <span style={{ color:'#f0f0f5', fontWeight:600, fontSize:'.85rem' }}>{success.transactionId}</span>
+            <span style={{ color:'#6a7080', fontSize:'.75rem', letterSpacing:'1px' }}>TRANSACTION</span>
+            <span style={{ color:'#f0f2f8', fontWeight:600, fontSize:'.85rem' }}>{success.transactionId}</span>
           </div>
           <div style={S.confirmRow}>
-            <span style={{ color:'#7a7a9a', fontSize:'.75rem', letterSpacing:'1px' }}>AMOUNT PAID</span>
-            <span style={{ color:'#4ade80', fontWeight:700, fontSize:'1.1rem' }}>${booking?.amount}</span>
+            <span style={{ color:'#6a7080', fontSize:'.75rem', letterSpacing:'1px' }}>AMOUNT PAID</span>
+            <span style={{ color:'#c8cdd6', fontWeight:700, fontSize:'1.1rem' }}>${booking?.amount}</span>
           </div>
         </div>
         <button style={S.btnPrimary} onClick={() => navigate('/catalog')}>BACK TO FLEET</button>
@@ -286,7 +286,7 @@ const Payment = () => {
                 onClick={handlePaypalPay} disabled={processing}>
                 {processing ? 'CONNECTING...' : `PAY $${booking.amount} WITH PAYPAL`}
               </button>
-              <p style={{ color:'#7a7a9a', fontSize:'.75rem', textAlign:'center', marginTop:'12px' }}>
+              <p style={{ color:'#6a7080', fontSize:'.75rem', textAlign:'center', marginTop:'12px' }}>
                 You will be redirected to PayPal to complete payment.
               </p>
             </>
@@ -307,7 +307,7 @@ const Payment = () => {
                 </div>
                 <div style={S.cashStep}>
                   <span style={S.stepNum}>3</span>
-                  <span>Pay the full amount of <strong style={{ color:'#e46033' }}>${booking.amount}</strong> in cash at pickup.</span>
+                  <span>Pay the full amount of <strong style={{ color:'#9b1c31' }}>${booking.amount}</strong> in cash at pickup.</span>
                 </div>
                 <div style={S.cashStep}>
                   <span style={S.stepNum}>4</span>
@@ -328,30 +328,30 @@ const Payment = () => {
             <p style={S.summaryTitle}>ORDER SUMMARY</p>
 
             <div style={{ marginBottom:'20px' }}>
-              <p style={{ color:'#e46033', fontSize:'.75rem', fontWeight:700, letterSpacing:'2px', margin:'0 0 4px' }}>
+              <p style={{ color:'#9b1c31', fontSize:'.75rem', fontWeight:700, letterSpacing:'2px', margin:'0 0 4px' }}>
                 VEHICLE
               </p>
               <p style={{ color:'#fff', fontSize:'1.4rem', fontFamily:'serif', margin:'0 0 2px' }}>
                 {booking.make} {booking.model}
               </p>
-              <p style={{ color:'#7a7a9a', fontSize:'.85rem', margin:0 }}>{booking.year}</p>
+              <p style={{ color:'#6a7080', fontSize:'.85rem', margin:0 }}>{booking.year}</p>
             </div>
 
-            <div style={{ borderTop:'1px solid #2a2a3a', paddingTop:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
+            <div style={{ borderTop:'1px solid #1e1e2e', paddingTop:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
               <div style={S.sumRow}>
-                <span style={{ color:'#7a7a9a' }}>Confirmation #</span>
+                <span style={{ color:'#6a7080' }}>Confirmation #</span>
                 <span style={{ fontSize:'.85rem', fontWeight:600 }}>{booking.confirmationNumber}</span>
               </div>
               <div style={S.sumRow}>
-                <span style={{ color:'#7a7a9a' }}>Check-in</span>
+                <span style={{ color:'#6a7080' }}>Check-in</span>
                 <span>{new Date(booking.startDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
               </div>
               <div style={S.sumRow}>
-                <span style={{ color:'#7a7a9a' }}>Check-out</span>
+                <span style={{ color:'#6a7080' }}>Check-out</span>
                 <span>{new Date(booking.endDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
               </div>
               <div style={S.sumRow}>
-                <span style={{ color:'#7a7a9a' }}>Payment Method</span>
+                <span style={{ color:'#6a7080' }}>Payment Method</span>
                 <span style={{ textTransform:'capitalize' }}>{booking.method?.replace('_',' ')}</span>
               </div>
             </div>
@@ -359,7 +359,7 @@ const Payment = () => {
             <div style={{ borderTop:'1px solid #3a2510', marginTop:'16px', paddingTop:'16px' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <span style={{ fontWeight:700, fontSize:'1.1rem' }}>TOTAL DUE</span>
-                <span style={{ color:'#e46033', fontWeight:800, fontSize:'1.6rem' }}>
+                <span style={{ color:'#9b1c31', fontWeight:800, fontSize:'1.6rem' }}>
                   ${booking.amount}
                 </span>
               </div>
@@ -368,8 +368,8 @@ const Payment = () => {
             {/* Security badges */}
             <div style={{ marginTop:'24px', display:'flex', gap:'10px', flexWrap:'wrap', justifyContent:'center' }}>
               {['🔒 SSL Secured', '🛡️ Protected', '✅ Verified'].map(b => (
-                <span key={b} style={{ background:'#1a1a24', border:'1px solid #2a2a3a',
-                  borderRadius:'20px', padding:'4px 12px', fontSize:'.7rem', color:'#7a7a9a' }}>
+                <span key={b} style={{ background:'#13131c', border:'1px solid #1e1e2e',
+                  borderRadius:'20px', padding:'4px 12px', fontSize:'.7rem', color:'#6a7080' }}>
                   {b}
                 </span>
               ))}
@@ -382,30 +382,30 @@ const Payment = () => {
 };
 
 const S = {
-  wrapper:     { background:'#000', minHeight:'100vh', padding:'40px 30px', fontFamily:"'DM Sans', sans-serif" },
+  wrapper:     { background:'#050508', minHeight:'100vh', padding:'40px 30px', fontFamily:"'DM Sans', sans-serif" },
   container:   { display:'grid', gridTemplateColumns:'1.2fr 1fr', gap:'32px', maxWidth:'1000px', margin:'0 auto', alignItems:'start' },
   left:        { display:'flex', flexDirection:'column', gap:'16px' },
   right:       { position:'sticky', top:'100px' },
-  backBtn:     { background:'none', border:'none', color:'#e46033', cursor:'pointer', fontWeight:'bold', padding:0, fontSize:'.9rem', textAlign:'left' },
+  backBtn:     { background:'none', border:'none', color:'#9b1c31', cursor:'pointer', fontWeight:'bold', padding:0, fontSize:'.9rem', textAlign:'left' },
   pageTitle:   { fontFamily:'serif', fontSize:'2.4rem', color:'#fff', margin:'8px 0 4px', lineHeight:1 },
-  pageSubtitle:{ color:'#7a7a9a', fontSize:'.9rem', margin:'0 0 8px' },
+  pageSubtitle:{ color:'#6a7080', fontSize:'.9rem', margin:'0 0 8px' },
   field:       { display:'flex', flexDirection:'column', gap:'6px' },
-  lbl:         { fontSize:'.65rem', color:'#7a7a9a', letterSpacing:'2px', fontWeight:700 },
-  input:       { background:'#0d0d14', border:'1px solid #2a2a3a', borderRadius:'10px', color:'#f0f0f5', padding:'14px 16px', fontSize:'1rem', fontFamily:'monospace', outline:'none', colorScheme:'dark', transition:'border-color .2s' },
-  btnPrimary:  { background:'#e46033', border:'none', padding:'16px', borderRadius:'12px', color:'#000', fontWeight:800, fontSize:'1rem', cursor:'pointer', letterSpacing:'1px', width:'100%', transition:'opacity .2s' },
+  lbl:         { fontSize:'.65rem', color:'#6a7080', letterSpacing:'2px', fontWeight:700 },
+  input:       { background:'#0d0d14', border:'1px solid #1e1e2e', borderRadius:'10px', color:'#f0f2f8', padding:'14px 16px', fontSize:'1rem', fontFamily:'monospace', outline:'none', colorScheme:'dark', transition:'border-color .2s' },
+  btnPrimary:  { background:'linear-gradient(135deg,#9b1c31,#7a1526)', border:'none', padding:'16px', borderRadius:'12px', color:'#000', fontWeight:800, fontSize:'1rem', cursor:'pointer', letterSpacing:'1px', width:'100%', transition:'opacity .2s' },
   btnPaypal:   { background:'#003087', border:'none', padding:'16px', borderRadius:'12px', color:'#fff', fontWeight:800, fontSize:'1rem', cursor:'pointer', letterSpacing:'1px', width:'100%' },
   paypalLogo:  { textAlign:'center', padding:'24px 0 8px', letterSpacing:'1px' },
   cashIcon:    { fontSize:'5rem', textAlign:'center', padding:'16px 0' },
-  cashInfo:    { background:'#13131a', border:'1px solid #2a2a3a', borderRadius:'14px', padding:'24px', display:'flex', flexDirection:'column', gap:'16px' },
+  cashInfo:    { background:'#0e0e14', border:'1px solid #1e1e2e', borderRadius:'14px', padding:'24px', display:'flex', flexDirection:'column', gap:'16px' },
   cashStep:    { display:'flex', gap:'14px', alignItems:'flex-start', color:'#c0c0d0', fontSize:'.9rem', lineHeight:1.5 },
-  stepNum:     { background:'#e46033', color:'#000', width:'24px', height:'24px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'.8rem', flexShrink:0 },
-  summaryCard: { background:'#13131a', border:'1px solid #2a2a3a', borderRadius:'18px', padding:'28px' },
-  summaryTitle:{ margin:'0 0 20px', fontSize:'.7rem', fontWeight:700, letterSpacing:'2px', color:'#7a7a9a', paddingBottom:'12px', borderBottom:'1px solid #2a2a3a' },
-  sumRow:      { display:'flex', justifyContent:'space-between', fontSize:'.88rem', color:'#f0f0f5' },
-  successBox:  { background:'#13131a', border:'1px solid #2a2a3a', borderRadius:'20px', padding:'60px 40px', maxWidth:'520px', margin:'80px auto', textAlign:'center' },
-  confirmBox:  { background:'#0d0d14', border:'1px solid #2a2a3a', borderRadius:'12px', padding:'20px 24px', marginBottom:'28px', display:'flex', flexDirection:'column', gap:'12px' },
+  stepNum:     { background:'linear-gradient(135deg,#9b1c31,#7a1526)', color:'#000', width:'24px', height:'24px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'.8rem', flexShrink:0 },
+  summaryCard: { background:'#0e0e14', border:'1px solid #1e1e2e', borderRadius:'18px', padding:'28px' },
+  summaryTitle:{ margin:'0 0 20px', fontSize:'.7rem', fontWeight:700, letterSpacing:'2px', color:'#6a7080', paddingBottom:'12px', borderBottom:'1px solid #1e1e2e' },
+  sumRow:      { display:'flex', justifyContent:'space-between', fontSize:'.88rem', color:'#f0f2f8' },
+  successBox:  { background:'#0e0e14', border:'1px solid #1e1e2e', borderRadius:'20px', padding:'60px 40px', maxWidth:'520px', margin:'80px auto', textAlign:'center' },
+  confirmBox:  { background:'#0d0d14', border:'1px solid #1e1e2e', borderRadius:'12px', padding:'20px 24px', marginBottom:'28px', display:'flex', flexDirection:'column', gap:'12px' },
   confirmRow:  { display:'flex', justifyContent:'space-between', alignItems:'center' },
-  centerText:  { textAlign:'center', padding:'100px', color:'#e46033' },
+  centerText:  { textAlign:'center', padding:'100px', color:'#9b1c31' },
 };
 
 export default Payment;

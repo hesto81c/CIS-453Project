@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════════════
+   RENTAL 10 — LUXURY THEME
+   Palette: Deep Black + Cherry Red/Burgundy + Silver
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Core Palette */
+  --black:        #050508;
+  --black-soft:   #0e0e14;
+  --black-card:   #13131c;
+  --black-hover:  #1a1a26;
+  --border:       #1e1e2e;
+  --border-light: #2a2a3e;
+
+  /* Cherry Red / Burgundy */
+  --cherry:       #9b1c31;
+  --cherry-light: #c0253f;
+  --cherry-glow:  #7a1526;
+  --burgundy:     #5c0f20;
+  --red-accent:   #e8203a;
+
+  /* Silver */
+  --silver:       #c8cdd6;
+  --silver-light: #e8eaf0;
+  --silver-dim:   #8a909e;
+  --silver-dark:  #4a5060;
+
+  /* Text */
+  --text-primary:   #f0f2f8;
+  --text-secondary: #9098aa;
+  --text-muted:     #4a5060;
+
+  /* Gradients */
+  --grad-cherry: linear-gradient(135deg, #9b1c31, #5c0f20);
+  --grad-dark:   linear-gradient(180deg, #0e0e14, #050508);
+  --grad-card:   linear-gradient(135deg, #13131c, #1a1a26);
+
+  /* Shadows */
+  --shadow-cherry: 0 0 40px rgba(155, 28, 49, 0.25);
+  --shadow-card:   0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow:   0 0 20px rgba(155, 28, 49, 0.4);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Montserrat', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--black);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--cherry); border-radius: 3px; }
+
+/* Selection */
+::selection { background: var(--cherry); color: var(--silver-light); }

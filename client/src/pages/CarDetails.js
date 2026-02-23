@@ -91,7 +91,7 @@ const CarDetails = () => {
           </div>
 
           <h1 style={styles.title}>{car.model}</h1>
-          <p style={{ color: '#7a7a9a', marginTop: '-10px', fontSize: '.9rem' }}>
+          <p style={{ color: '#6a7080', marginTop: '-10px', fontSize: '.9rem' }}>
             {car.year} · Plate: {car.plateNumber}
           </p>
 
@@ -114,7 +114,7 @@ const CarDetails = () => {
             ].map(s => (
               <div key={s.label} style={styles.specItem}>
                 <span style={styles.specLabel}>{s.label}</span>
-                <strong style={{ textTransform: 'capitalize', color: '#f0f0f5' }}>{s.value}</strong>
+                <strong style={{ textTransform: 'capitalize', color: '#f0f2f8' }}>{s.value}</strong>
               </div>
             ))}
           </div>
@@ -141,11 +141,11 @@ const CarDetails = () => {
                 <div key={i} style={styles.reviewItem}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <span style={{ fontWeight: 600, fontSize: '.85rem' }}>{r.author}</span>
-                    <span style={{ color: '#e46033', letterSpacing: '2px', fontSize: '.8rem' }}>
+                    <span style={{ color: '#9b1c31', letterSpacing: '2px', fontSize: '.8rem' }}>
                       {stars(r.rating)}
                     </span>
                   </div>
-                  <p style={{ margin: 0, color: '#7a7a9a', fontSize: '.82rem', lineHeight: 1.5 }}>
+                  <p style={{ margin: 0, color: '#6a7080', fontSize: '.82rem', lineHeight: 1.5 }}>
                     {r.comment}
                   </p>
                 </div>
@@ -174,14 +174,14 @@ const CarDetails = () => {
 
 const styles = {
   wrapper: {
-    background: '#000', minHeight: '100vh',
+    background: '#050508', minHeight: '100vh',
     padding: '40px', display: 'flex', justifyContent: 'center',
   },
   container: {
     display: 'grid', gridTemplateColumns: '1.2fr 1fr',
     maxWidth: '1200px', width: '100%',
-    background: '#13131a', borderRadius: '20px',
-    border: '1px solid #2a2a3a', overflow: 'hidden',
+    background: '#0e0e14', borderRadius: '20px',
+    border: '1px solid #1e1e2e', overflow: 'hidden',
     alignItems: 'start',
   },
   imageSection: { width: '100%', position: 'sticky', top: '80px' },
@@ -192,44 +192,44 @@ const styles = {
     overflowY: 'auto', maxHeight: 'calc(100vh - 120px)',
   },
   backBtn: {
-    background: 'none', border: 'none', color: '#e46033',
+    background: 'none', border: 'none', color: '#9b1c31',
     cursor: 'pointer', textAlign: 'left', fontWeight: 'bold',
     padding: 0, fontSize: '.9rem',
   },
-  brandBadge: { color: '#e46033', fontWeight: 'bold', letterSpacing: '2px', fontSize: '.85rem' },
+  brandBadge: { color: '#9b1c31', fontWeight: 'bold', letterSpacing: '2px', fontSize: '.85rem' },
   title: { fontSize: '3.5rem', margin: '4px 0 0', color: '#fff', fontFamily: 'serif', lineHeight: 1 },
   priceContainer: { margin: '10px 0' },
-  priceAmount: { fontSize: '3rem', color: '#e46033', fontWeight: 'bold' },
-  priceUnit: { color: '#7a7a9a', fontSize: '1rem' },
+  priceAmount: { fontSize: '3rem', color: '#9b1c31', fontWeight: 'bold' },
+  priceUnit: { color: '#6a7080', fontSize: '1rem' },
   specsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' },
   specItem: {
-    background: '#1a1a24', padding: '12px', borderRadius: '10px',
-    textAlign: 'center', border: '1px solid #2a2a3a',
+    background: '#13131c', padding: '12px', borderRadius: '10px',
+    textAlign: 'center', border: '1px solid #1e1e2e',
     display: 'flex', flexDirection: 'column', gap: '4px',
   },
-  specLabel: { color: '#7a7a9a', fontSize: '.65rem', letterSpacing: '1px' },
+  specLabel: { color: '#6a7080', fontSize: '.65rem', letterSpacing: '1px' },
   locationBox: {
     marginTop: '5px', padding: '14px 16px',
-    background: '#1a1a24', borderRadius: '10px',
-    border: '1px solid #2a2a3a', color: '#7a7a9a',
+    background: '#13131c', borderRadius: '10px',
+    border: '1px solid #1e1e2e', color: '#6a7080',
   },
   reviewsSection: { display: 'flex', flexDirection: 'column', gap: '8px' },
   reviewsTitle: {
     margin: '0 0 4px', fontSize: '.7rem', fontWeight: 600,
-    letterSpacing: '2px', color: '#7a7a9a',
-    paddingBottom: '8px', borderBottom: '1px solid #2a2a3a',
+    letterSpacing: '2px', color: '#6a7080',
+    paddingBottom: '8px', borderBottom: '1px solid #1e1e2e',
   },
   reviewItem: {
-    background: '#1a1a24', padding: '12px 14px',
-    borderRadius: '10px', border: '1px solid #2a2a3a',
+    background: '#13131c', padding: '12px 14px',
+    borderRadius: '10px', border: '1px solid #1e1e2e',
   },
   bookBtn: {
-    background: '#e46033', border: 'none', padding: '20px',
+    background: '#9b1c31', border: 'none', padding: '20px',
     borderRadius: '10px', color: '#000', fontWeight: 'bold',
     fontSize: '1.2rem', cursor: 'pointer', marginTop: 'auto',
     letterSpacing: '1px',
   },
-  centerText: { textAlign: 'center', padding: '100px', color: '#e46033' },
+  centerText: { textAlign: 'center', padding: '100px', color: '#9b1c31' },
 };
 
 export default CarDetails;

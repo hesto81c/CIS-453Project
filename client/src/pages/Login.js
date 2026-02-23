@@ -4,16 +4,16 @@ import api from '../services/api';
 import './Login.css';
 
 const Login = () => {
-    const [email, setEmail]         = useState('');
-    const [password, setPassword]   = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName]   = useState('');
-    const [phone, setPhone]         = useState('');
-    const [isActive, setIsActive]   = useState(false);
-    const navigate  = useNavigate();
-    const location  = useLocation();
+    const [email,         setEmail]         = useState('');
+    const [password,      setPassword]      = useState('');
+    const [firstName,     setFirstName]     = useState('');
+    const [lastName,      setLastName]      = useState('');
+    const [phone,         setPhone]         = useState('');
+    const [driverLicense, setDriverLicense] = useState('');
+    const [isActive,      setIsActive]      = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    // If redirected from /booking/:id, go back there after login
     const redirectTo = location.state?.from || '/catalog';
 
     const handleLogin = async (e) => {
@@ -23,7 +23,7 @@ const Login = () => {
             localStorage.setItem('token',         response.data.token);
             localStorage.setItem('userId',        response.data.user.id);
             localStorage.setItem('userFirstName', response.data.user.firstName);
-            navigate(redirectTo); // returns to booking page if redirected
+            navigate(redirectTo);
         } catch (error) {
             alert(error.response?.data?.message || "Invalid credentials");
         }
@@ -34,11 +34,10 @@ const Login = () => {
         try {
             await api.post('/auth/register', {
                 email, password, firstName,
-                lastName:      lastName || 'Customer',
-                phone:         phone    || '000-000-0000',
-                driverLicense: 'DL-' + Date.now(),
+                lastName:      lastName      || null,
+                phone:         phone         || null,
+                driverLicense: driverLicense || null,
             });
-            // Auto-login after register so user can continue booking
             const loginRes = await api.post('/auth/login', { email, password });
             localStorage.setItem('token',         loginRes.data.token);
             localStorage.setItem('userId',        loginRes.data.user.id);
@@ -52,76 +51,98 @@ const Login = () => {
     return (
         <div className="exclusive-auth-wrapper">
             <div className={`auth-main-container ${isActive ? 'active' : ''}`}>
-                <div className="auth-bg-curve-1"></div>
+                <div className="auth-bg-curve-1"/>
 
-                {/* Login Side */}
+                {/* ── LOGIN FORM ── */}
                 <div className="auth-box-side login-side">
-                    <h2>Login</h2>
+                    <h2>Sign <span>In</span></h2>
+                    <p className="auth-subtitle">Access your account</p>
+
                     {redirectTo !== '/catalog' && (
-                        <p style={{ color: '#e46033', fontSize: '.8rem', marginBottom: '8px' }}>
+                        <div className="auth-redirect-notice">
                             Please log in to complete your booking.
-                        </p>
+                        </div>
                     )}
+
                     <form onSubmit={handleLogin}>
                         <div className={`a-input ${email ? 'has-val' : ''}`}>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                            <label>Email</label>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                            <label>Email Address</label>
                         </div>
                         <div className={`a-input ${password ? 'has-val' : ''}`}>
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                             <label>Password</label>
                         </div>
-                        <button type="submit" className="a-btn">Login</button>
-                        <div style={{ marginTop: '16px' }}>
-                            <p style={{ color: '#fff', fontSize: '.85rem' }}>
-                                Need an account?{' '}
-                                <span onClick={() => setIsActive(true)} style={{ color: '#e46033', cursor: 'pointer', fontWeight: 'bold' }}>Sign Up</span>
-                            </p>
-                        </div>
+                        <button type="submit" className="a-btn">Enter</button>
                     </form>
+
+                    <p className="auth-switch">
+                        No account yet?{' '}
+                        <span onClick={() => setIsActive(true)}>Create one</span>
+                    </p>
                 </div>
 
-                {/* Register Side */}
+                {/* ── REGISTER FORM ── */}
                 <div className="auth-box-side register-side">
-                    <h2>Sign Up</h2>
+                    <h2>Join <span>Us</span></h2>
+                    <p className="auth-subtitle">Create your account</p>
+
                     <form onSubmit={handleRegister}>
-                        <div className={`a-input ${firstName ? 'has-val' : ''}`}>
-                            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                            <label>First Name</label>
-                        </div>
-                        <div className={`a-input ${lastName ? 'has-val' : ''}`}>
-                            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                            <label>Last Name</label>
-                        </div>
-                        <div className={`a-input ${phone ? 'has-val' : ''}`}>
-                            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                            <label>Phone</label>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
+                            <div className={`a-input ${firstName ? 'has-val' : ''}`}>
+                                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required />
+                                <label>First Name</label>
+                            </div>
+                            <div className={`a-input ${lastName ? 'has-val' : ''}`}>
+                                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} />
+                                <label>Last Name</label>
+                            </div>
                         </div>
                         <div className={`a-input ${email ? 'has-val' : ''}`}>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                            <label>Email</label>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                            <label>Email Address</label>
                         </div>
                         <div className={`a-input ${password ? 'has-val' : ''}`}>
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                             <label>Password</label>
                         </div>
-                        <button type="submit" className="a-btn">Register</button>
-                        <div style={{ marginTop: '16px' }}>
-                            <p style={{ color: '#fff', fontSize: '.85rem' }}>
-                                Have an account?{' '}
-                                <span onClick={() => setIsActive(false)} style={{ color: '#e46033', cursor: 'pointer', fontWeight: 'bold' }}>Login</span>
-                            </p>
+                        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
+                            <div className={`a-input ${phone ? 'has-val' : ''}`}>
+                                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} />
+                                <label>Phone</label>
+                            </div>
+                            <div className={`a-input ${driverLicense ? 'has-val' : ''}`}>
+                                <input type="text" value={driverLicense} onChange={e => setDriverLicense(e.target.value)} />
+                                <label>Driver's License</label>
+                            </div>
                         </div>
+                        <button type="submit" className="a-btn">Create Account</button>
                     </form>
+
+                    <p className="auth-switch">
+                        Already a member?{' '}
+                        <span onClick={() => setIsActive(false)}>Sign in</span>
+                    </p>
                 </div>
 
+                {/* ── LOGIN OVERLAY PANEL ── */}
                 <div className="auth-overlay-text login-text">
-                    <h2>RENTAL 10</h2>
-                    <p>Luxury Fleet.</p>
+                    <span className="overlay-tag">Rental 10 · Premium Fleet</span>
+                    <span className="overlay-number">10</span>
+                    <h2>Welcome<br/>Back</h2>
+                    <div className="overlay-line"/>
+                    <p>Luxury vehicles.<br/>Exceptional service.<br/>Unforgettable journeys.</p>
+                    <span className="overlay-vertical">Est. Syracuse · 2026</span>
                 </div>
+
+                {/* ── REGISTER OVERLAY PANEL ── */}
                 <div className="auth-overlay-text register-text">
-                    <h2>WELCOME</h2>
-                    <p>Join the elite.</p>
+                    <span className="overlay-tag">Join the Elite</span>
+                    <span className="overlay-number">R</span>
+                    <h2>Begin<br/>Your Journey</h2>
+                    <div className="overlay-line"/>
+                    <p>Exclusive access.<br/>Premium experience.<br/>Your fleet awaits.</p>
+                    <span className="overlay-vertical">Rental 10 · Members</span>
                 </div>
             </div>
         </div>
