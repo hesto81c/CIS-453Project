@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Catalog from './pages/Catalog';
 import CarDetails from './pages/CarDetails';
-import Booking from './pages/Booking'; // NEW
+import Booking from './pages/Booking';
+import Payment from './pages/Payment'; // NEW
 
 function App() {
   const handleLogout = () => {
@@ -55,7 +56,8 @@ function App() {
             <Route path="/login"        element={<Login />} />
             <Route path="/register"     element={<Login />} />
             <Route path="/details/:id"  element={<CarDetails />} />
-            <Route path="/booking/:id"  element={<Booking />} />  {/* NEW */}
+            <Route path="/booking/:id"  element={<Booking />} />
+            <Route path="/payment/:bookingId" element={<Payment />} />  {/* NEW */}
             <Route path="/"             element={<Catalog />} />
           </Routes>
         </main>

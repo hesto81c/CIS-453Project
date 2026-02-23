@@ -146,7 +146,7 @@ const Booking = () => {
         insuranceFee, taxAmount: parseFloat(taxAmount.toFixed(2)), paymentMethod,
         driverFirst, driverLast, driverLicense, driverPhone, driverEmail, notes,
       }, { headers: { Authorization: `Bearer ${token}` } });
-      setSuccess(res.data);
+      navigate(`/payment/${res.data.bookingId}`);
     } catch (err) {
       if (err.response?.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('userId'); navigate('/login', { state: { from: location.pathname } }); }
       else alert(err.response?.data?.error || "Booking failed. Please try again.");
