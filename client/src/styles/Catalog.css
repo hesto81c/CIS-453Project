@@ -1,0 +1,329 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════
+   RENTAL 10 — CATALOG
+   Black · Cherry Red · Silver
+   ═══════════════════════════════════ */
+
+.slider-container {
+    width: 100%;
+    height: calc(100vh - 70px);
+    background: #050508;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 80%, rgba(155,28,49,0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(92,15,32,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Title ── */
+.now-showing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 400;
+    letter-spacing: 12px;
+    color: #f0f2f8;
+    text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 10;
+    text-align: center;
+    padding: 18px 0 16px;
+    background: linear-gradient(180deg, rgba(5,5,8,0.98) 0%, rgba(5,5,8,0.7) 70%, transparent 100%);
+}
+
+.now-showing::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #9b1c31, transparent);
+    margin: 8px auto 0;
+}
+
+/* ── Accordion ── */
+.accordion-slider {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ── Each Slide ── */
+.slide {
+    flex: 1;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    min-width: 56px;
+    border-right: 1px solid #0e0e14;
+    transition:
+        flex 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.4s ease;
+    overflow: hidden;
+}
+
+/* Hover OR active expands */
+.slide:hover,
+.slide.active {
+    flex: 7;
+    box-shadow: inset 0 0 60px rgba(155,28,49,0.12);
+}
+
+/* Top shimmer accent line */
+.slide:hover::before,
+.slide.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #9b1c31, #c8cdd6, #9b1c31, transparent);
+    z-index: 6;
+    animation: shimmer 2.5s ease infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1;   }
+}
+
+/* ── Dark gradient overlay ── */
+.slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(5,5,8,0.99)  0%,
+        rgba(5,5,8,0.85)  30%,
+        rgba(5,5,8,0.55)  60%,
+        rgba(5,5,8,0.25) 100%
+    );
+    transition: background 0.5s ease;
+    z-index: 1;
+}
+
+.slide:hover::after,
+.slide.active::after {
+    background: linear-gradient(
+        to top,
+        rgba(5,5,8,0.99)  0%,
+        rgba(5,5,8,0.88)  30%,
+        rgba(5,5,8,0.60)  58%,
+        rgba(5,5,8,0.20)  80%,
+        rgba(5,5,8,0.05) 100%
+    );
+}
+
+/* ── Collapsed vertical label ── */
+.slide-label-collapsed {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 28px;
+    gap: 10px;
+    z-index: 3;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.slide:hover  .slide-label-collapsed,
+.slide.active .slide-label-collapsed {
+    opacity: 0;
+}
+
+.label-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: #9b1c31;
+    letter-spacing: 3px;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+}
+
+.label-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: .55rem;
+    color: #c8cdd6;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    max-height: 130px;
+    overflow: hidden;
+    font-weight: 600;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+}
+
+/* ── Slide Content ── */
+.slide-content {
+    position: absolute;
+    bottom: 10%;
+    left: 48px;
+    right: 48px;
+    z-index: 5;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+        opacity   0.4s ease 0.18s,
+        transform 0.4s ease 0.18s;
+    pointer-events: none;
+}
+
+.slide:hover  .slide-content,
+.slide.active .slide-content {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ── Slide Number ── */
+.slide-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #9b1c31;
+    letter-spacing: 5px;
+    margin-bottom: 8px;
+}
+
+/* ── Brand & Model ── */
+.car-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-size: .6rem;
+    font-weight: 700;
+    color: #c8cdd6;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.car-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 2.8vw, 2.8rem);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 18px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+}
+
+/* ── Specs ── */
+.car-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 24px;
+    border-left: 2px solid #9b1c31;
+    padding-left: 14px;
+}
+
+.spec-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.spec-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: .55rem;
+    color: #8a909e;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    min-width: 72px;
+}
+
+.spec-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: .72rem;
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+}
+
+/* ── Buttons ── */
+.slide-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 220px;
+}
+
+.details-btn {
+    padding: 11px 20px;
+    background: rgba(5,5,8,0.6);
+    border: 1px solid rgba(200,205,214,0.5);
+    color: #f0f2f8;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: .6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all .25s ease;
+    width: 100%;
+    backdrop-filter: blur(4px);
+}
+
+.details-btn:hover {
+    border-color: #ffffff;
+    color: #ffffff;
+    background: rgba(200,205,214,0.15);
+}
+
+.rent-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #9b1c31, #7a1526);
+    border: 1px solid rgba(155,28,49,0.8);
+    color: #ffffff;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: .6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(155,28,49,0.6), 0 0 0 1px rgba(155,28,49,0.3);
+    transition: all .25s ease;
+}
+
+.rent-btn:hover {
+    background: linear-gradient(135deg, #c0253f, #9b1c31);
+    box-shadow: 0 6px 30px rgba(155,28,49,0.8);
+    transform: translateY(-1px);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .accordion-slider  { flex-direction: column; }
+    .slide             { min-width: unset; min-height: 56px; }
+    .slide:hover,
+    .slide.active      { flex: 6; }
+    .label-name        { writing-mode: unset; transform: none; }
+    .slide-content     { left: 24px; right: 24px; }
+}

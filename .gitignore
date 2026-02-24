@@ -1,0 +1,11 @@
+# Security: Ignore local environment variables and credentials
+.env
+
+# Dependencies: Do not upload Node.js or React libraries
+node_modules/
+
+# System files and logs
+npm-debug.log*
+.DS_Store
+dist/
+build/
