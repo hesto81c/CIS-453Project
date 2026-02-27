@@ -6,21 +6,19 @@ const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [car, setCar] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [car,          setCar]          = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState(false);
+  const [availability, setAvailability] = useState(null);
 
   useEffect(() => {
     axios.get(`http://localhost:5000/api/cars/${id}`)
-      .then(res => {
-        setCar(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("API Error:", err);
-        setError(true);
-        setLoading(false);
-      });
+      .then(res => { setCar(res.data); setLoading(false); })
+      .catch(err => { console.error("API Error:", err); setError(true); setLoading(false); });
+
+    axios.get(`http://localhost:5000/api/cars/${id}/availability`)
+      .then(res => setAvailability(res.data))
+      .catch(() => {});
   }, [id]);
 
   // Always go to catalog — details is opened in a new tab from fleet
@@ -100,6 +98,32 @@ const CarDetails = () => {
             <span style={styles.priceAmount}>${Number(car.dailyRate).toFixed(2)}</span>
             <span style={styles.priceUnit}> / DAY</span>
           </div>
+
+          {/* Availability */}
+          {availability && (
+            <div style={{ display:'flex', gap:'10px', marginBottom:'20px', flexWrap:'wrap' }}>
+              <div style={{
+                background: availability.available > 0 ? 'rgba(20,80,40,0.3)' : 'rgba(155,28,49,0.15)',
+                border: `1px solid ${availability.available > 0 ? 'rgba(74,222,128,0.3)' : 'rgba(155,28,49,0.4)'}`,
+                borderRadius:'3px', padding:'8px 16px', display:'flex', flexDirection:'column', alignItems:'center', gap:'2px',
+              }}>
+                <span style={{ fontSize:'1.4rem', fontWeight:800, color: availability.available > 0 ? '#4ade80' : '#f87171', fontFamily:"'Cormorant Garamond',serif" }}>
+                  {availability.available}
+                </span>
+                <span style={{ fontSize:'.55rem', color:'#4a5060', letterSpacing:'2px', fontWeight:700 }}>AVAILABLE</span>
+              </div>
+              {availability.rented > 0 && (
+                <div style={{ background:'rgba(155,28,49,0.15)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'3px', padding:'8px 16px', display:'flex', flexDirection:'column', alignItems:'center', gap:'2px' }}>
+                  <span style={{ fontSize:'1.4rem', fontWeight:800, color:'#f87171', fontFamily:"'Cormorant Garamond',serif" }}>{availability.rented}</span>
+                  <span style={{ fontSize:'.55rem', color:'#4a5060', letterSpacing:'2px', fontWeight:700 }}>RENTED</span>
+                </div>
+              )}
+              <div style={{ background:'rgba(30,30,46,0.5)', border:'1px solid #1e1e2e', borderRadius:'3px', padding:'8px 16px', display:'flex', flexDirection:'column', alignItems:'center', gap:'2px' }}>
+                <span style={{ fontSize:'1.4rem', fontWeight:800, color:'#c8cdd6', fontFamily:"'Cormorant Garamond',serif" }}>{availability.total}</span>
+                <span style={{ fontSize:'.55rem', color:'#4a5060', letterSpacing:'2px', fontWeight:700 }}>TOTAL UNITS</span>
+              </div>
+            </div>
+          )}
 
           {/* Specs Grid */}
           <div style={styles.specsGrid}>

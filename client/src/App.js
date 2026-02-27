@@ -8,6 +8,7 @@ import Payment from './pages/Payment';
 import AdminLogin from './pages/AdminLogin';
 import AdminFleet from './pages/AdminFleet';
 import Profile from './pages/Profile';
+import ResetPassword from './pages/ResetPassword';
 import './theme.css';
 
 const AppLayout = ({ children }) => {
@@ -132,6 +133,7 @@ function App() {
           <Route path="/login"              element={<Login />} />
           <Route path="/register"           element={<Login />} />
           <Route path="/profile"            element={<Profile />} />
+          <Route path="/reset-password"     element={<ResetPassword />} />
           <Route path="/details/:id"        element={<CarDetails />} />
           <Route path="/booking/:id"        element={<Booking />} />
           <Route path="/payment/:bookingId" element={<Payment />} />

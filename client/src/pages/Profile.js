@@ -9,12 +9,23 @@ const Profile = () => {
   const fileRef  = useRef();
   const token    = localStorage.getItem('token');
 
-  const [profile,  setProfile]  = useState(null);
-  const [form,     setForm]     = useState({});
-  const [saving,   setSaving]   = useState(false);
-  const [saved,    setSaved]    = useState(false);
-  const [loading,  setLoading]  = useState(true);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [profile,       setProfile]       = useState(null);
+  const [form,          setForm]          = useState({});
+  const [saving,        setSaving]        = useState(false);
+  const [saved,         setSaved]         = useState(false);
+  const [loading,       setLoading]       = useState(true);
+  const [photoPreview,  setPhotoPreview]  = useState(null);
+  const [bookings,      setBookings]      = useState([]);
+  const [bookLoading,   setBookLoading]   = useState(true);
+  const [cancelConfirm, setCancelConfirm] = useState(null);
+  const [cancelling,    setCancelling]    = useState(false);
+
+  const loadBookings = () => {
+    axios.get(`${API}/api/bookings/my-bookings`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => { setBookings(res.data); setBookLoading(false); })
+      .catch(() => setBookLoading(false));
+  };
 
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
@@ -32,20 +43,47 @@ const Profile = () => {
       setPhotoPreview(res.data.profilePhoto || null);
       setLoading(false);
     }).catch(() => { navigate('/login'); });
+
+    loadBookings();
   }, [token, navigate]);
 
   const F = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  // Convert uploaded image to base64 URL
+  // Compress image to max 300x300 before saving
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPhotoPreview(ev.target.result);
-      F('profilePhoto', ev.target.result);
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 300;
+      const scale = Math.min(MAX / img.width, MAX / img.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.width  * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      setPhotoPreview(compressed);
+      F('profilePhoto', compressed);
+      URL.revokeObjectURL(url);
     };
-    reader.readAsDataURL(file);
+    img.src = url;
+  };
+
+  const handleCancel = async () => {
+    if (!cancelConfirm) return;
+    setCancelling(true);
+    try {
+      await axios.post(`${API}/api/bookings/${cancelConfirm.id}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCancelConfirm(null);
+      loadBookings();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to cancel.');
+    } finally { setCancelling(false); }
   };
 
   const handleSave = async () => {
@@ -194,12 +232,124 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      {/* ── BOOKING HISTORY ── */}
+      <div style={S.historySection}>
+        <div style={S.historyHeader}>
+          <div>
+            <h2 style={S.historyTitle}>MY RESERVATIONS</h2>
+            <p style={S.historySub}>Your complete rental history</p>
+          </div>
+          <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.8rem', color:'#9b1c31', fontWeight:700 }}>
+            {bookings.length}
+          </span>
+        </div>
+
+        {bookLoading ? (
+          <p style={{ color:'#4a5060', letterSpacing:'3px', fontSize:'.75rem', textAlign:'center', padding:'40px' }}>LOADING...</p>
+        ) : bookings.length === 0 ? (
+          <div style={S.emptyHistory}>
+            <span style={{ fontSize:'2rem', marginBottom:'12px' }}>🚗</span>
+            <p style={{ color:'#4a5060', letterSpacing:'3px', fontSize:'.75rem' }}>NO RESERVATIONS YET</p>
+          </div>
+        ) : (
+          <div style={S.bookingsList}>
+            {bookings.map(b => {
+              const start     = new Date(b.startDate).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+              const end       = new Date(b.endDate).toLocaleDateString('en-US',   { month:'short', day:'numeric', year:'numeric' });
+              const isCancellable = ['pending','confirmed'].includes(b.status) && new Date(b.startDate) > new Date();
+              const statusColor = {
+                confirmed:'#4ade80', pending:'#fbbf24', cancelled:'#f87171',
+                active:'#a78bfa', completed:'#c8cdd6'
+              }[b.status] || '#6b7280';
+
+              return (
+                <div key={b.id} style={S.bookingCard}>
+                  {/* Car image */}
+                  <div style={{ width:'100px', minWidth:'100px', height:'70px', borderRadius:'3px', overflow:'hidden', border:'1px solid #1e1e2e' }}>
+                    <img src={b.imageUrl || `https://placehold.co/100x70/0e0e14/4a5060?text=${b.make}`}
+                      alt={b.model} style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                      onError={e => e.target.src=`https://placehold.co/100x70/0e0e14/4a5060?text=${b.make}`}/>
+                  </div>
+
+                  {/* Main info */}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'4px', flexWrap:'wrap' }}>
+                      <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.1rem', color:'#f0f2f8', fontWeight:700 }}>
+                        {b.year} {b.make} {b.model}
+                      </span>
+                      <span style={{ background:`${statusColor}18`, border:`1px solid ${statusColor}44`, color:statusColor, fontSize:'.55rem', fontWeight:700, letterSpacing:'2px', padding:'2px 8px', borderRadius:'2px' }}>
+                        {b.status?.toUpperCase()}
+                      </span>
+                    </div>
+                    <p style={{ color:'#4a5060', fontSize:'.68rem', letterSpacing:'1px', margin:'0 0 6px' }}>
+                      📅 {start} → {end}
+                    </p>
+                    <p style={{ color:'#3a3a50', fontSize:'.62rem', letterSpacing:'2px', margin:0, fontFamily:'monospace' }}>
+                      {b.confirmationNumber}
+                    </p>
+                  </div>
+
+                  {/* Amount + cancel */}
+                  <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'10px', minWidth:'100px' }}>
+                    <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.3rem', color:'#f0f2f8', fontWeight:700 }}>
+                      ${Number(b.totalAmount).toFixed(2)}
+                    </span>
+                    {isCancellable && (
+                      <button style={S.cancelBtn} onClick={() => setCancelConfirm(b)}>
+                        CANCEL
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── CANCEL CONFIRM MODAL ── */}
+      {cancelConfirm && (
+        <div style={S.overlay} onClick={e => { if (e.target === e.currentTarget) setCancelConfirm(null); }}>
+          <div style={S.modal}>
+            <div style={S.modalAccent}/>
+            <div style={{ fontSize:'2rem', textAlign:'center', marginBottom:'12px' }}>⚠️</div>
+            <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:'#f0f2f8', fontSize:'1.5rem', letterSpacing:'3px', textAlign:'center', margin:'0 0 12px' }}>
+              CANCEL RESERVATION
+            </h3>
+            <p style={{ color:'#6a7080', fontSize:'.82rem', textAlign:'center', lineHeight:1.7, marginBottom:'8px' }}>
+              {cancelConfirm.year} {cancelConfirm.make} {cancelConfirm.model}
+            </p>
+            <p style={{ color:'#3a3a50', fontSize:'.72rem', textAlign:'center', fontFamily:'monospace', letterSpacing:'2px', marginBottom:'24px' }}>
+              {cancelConfirm.confirmationNumber}
+            </p>
+            <p style={{ color:'#f87171', fontSize:'.72rem', textAlign:'center', letterSpacing:'1px', marginBottom:'24px' }}>
+              This action cannot be undone.
+            </p>
+            <div style={{ display:'flex', gap:'10px' }}>
+              <button
+                style={{ flex:1, background:'rgba(155,28,49,0.2)', border:'1px solid rgba(248,113,113,0.4)', color:'#f87171', padding:'12px', borderRadius:'3px', cursor:'pointer', fontSize:'.7rem', fontWeight:700, letterSpacing:'3px', fontFamily:"'Montserrat',sans-serif", opacity: cancelling ? .6 : 1 }}
+                onClick={handleCancel}
+                disabled={cancelling}
+              >
+                {cancelling ? 'CANCELLING...' : 'YES, CANCEL'}
+              </button>
+              <button
+                style={{ flex:1, background:'transparent', border:'1px solid #1e1e2e', color:'#c8cdd6', padding:'12px', borderRadius:'3px', cursor:'pointer', fontSize:'.7rem', fontWeight:700, letterSpacing:'3px', fontFamily:"'Montserrat',sans-serif" }}
+                onClick={() => setCancelConfirm(null)}
+              >
+                KEEP IT
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 const S = {
-  wrapper:       { background:'#050508', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'Montserrat',sans-serif" },
+  wrapper:       { background:'#050508', minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-start', padding:'40px 24px', fontFamily:"'Montserrat',sans-serif" },
   container:     { display:'grid', gridTemplateColumns:'300px 1fr', gap:'2px', width:'100%', maxWidth:'920px', borderRadius:'6px', overflow:'hidden', border:'1px solid #1e1e2e', boxShadow:'0 0 80px rgba(155,28,49,0.1), 0 40px 80px rgba(0,0,0,0.8)' },
   center:        { color:'#4a5060', textAlign:'center', padding:'100px', letterSpacing:'3px' },
 
@@ -233,6 +383,21 @@ const S = {
   inp:           { background:'transparent', border:'none', borderBottom:'1px solid #1e1e2e', color:'#f0f2f8', padding:'10px 0', fontSize:'.9rem', fontFamily:"'Montserrat',sans-serif", outline:'none', transition:'border-color .2s', letterSpacing:'.5px' },
   formDivider:   { height:'1px', background:'linear-gradient(90deg,transparent,#1e1e2e,transparent)', margin:'8px 0 24px' },
   btnSave:       { width:'100%', background:'linear-gradient(135deg,#9b1c31,#7a1526)', border:'none', borderRadius:'2px', color:'#f0f2f8', fontWeight:700, fontSize:'.72rem', letterSpacing:'4px', padding:'14px', cursor:'pointer', fontFamily:"'Montserrat',sans-serif", boxShadow:'0 4px 24px rgba(155,28,49,0.4)', transition:'all .3s', marginTop:'8px' },
+
+  // Booking history
+  historySection:{ width:'100%', maxWidth:'920px', marginTop:'24px', border:'1px solid #1e1e2e', borderRadius:'6px', overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.6)' },
+  historyHeader: { background:'#0e0e14', padding:'24px 32px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #1e1e2e' },
+  historyTitle:  { fontFamily:"'Cormorant Garamond',serif", fontSize:'1.4rem', letterSpacing:'4px', color:'#f0f2f8', margin:0 },
+  historySub:    { color:'#4a5060', fontSize:'.6rem', letterSpacing:'2px', margin:'4px 0 0', textTransform:'uppercase' },
+  bookingsList:  { background:'#0e0e14' },
+  bookingCard:   { display:'flex', alignItems:'center', gap:'20px', padding:'20px 32px', borderBottom:'1px solid #1e1e2e', transition:'background .15s' },
+  emptyHistory:  { background:'#0e0e14', padding:'60px', display:'flex', flexDirection:'column', alignItems:'center', gap:'8px' },
+  cancelBtn:     { background:'transparent', border:'1px solid rgba(248,113,113,0.3)', color:'#f87171', padding:'5px 12px', borderRadius:'2px', cursor:'pointer', fontSize:'.58rem', fontWeight:700, letterSpacing:'2px', fontFamily:"'Montserrat',sans-serif", transition:'all .2s' },
+
+  // Cancel modal
+  overlay:       { position:'fixed', inset:0, background:'rgba(5,5,8,0.9)', backdropFilter:'blur(8px)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'20px' },
+  modal:         { background:'#0e0e14', border:'1px solid #1e1e2e', borderRadius:'4px', padding:'36px', width:'100%', maxWidth:'400px', position:'relative' },
+  modalAccent:   { position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(90deg,transparent,#9b1c31,transparent)', borderRadius:'4px 4px 0 0' },
 };
 
 // Avatar hover fix (inline style can't do :hover, use onMouse)
