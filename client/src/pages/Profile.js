@@ -20,11 +20,16 @@ const Profile = () => {
   const [cancelConfirm, setCancelConfirm] = useState(null);
   const [cancelling,    setCancelling]    = useState(false);
 
-  const loadBookings = () => {
+  const loadBookings = (tkn) => {
+    const t = tkn || localStorage.getItem('token');
+    if (!t) return;
     axios.get(`${API}/api/bookings/my-bookings`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${t}` }
     }).then(res => { setBookings(res.data); setBookLoading(false); })
-      .catch(() => setBookLoading(false));
+      .catch(err => {
+        console.error('my-bookings error:', err.response?.data);
+        setBookLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -44,7 +49,7 @@ const Profile = () => {
       setLoading(false);
     }).catch(() => { navigate('/login'); });
 
-    loadBookings();
+    loadBookings(token);
   }, [token, navigate]);
 
   const F = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -74,13 +79,14 @@ const Profile = () => {
 
   const handleCancel = async () => {
     if (!cancelConfirm) return;
+    const t = localStorage.getItem('token');
     setCancelling(true);
     try {
       await axios.post(`${API}/api/bookings/${cancelConfirm.id}/cancel`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${t}` }
       });
       setCancelConfirm(null);
-      loadBookings();
+      loadBookings(t);
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to cancel.');
     } finally { setCancelling(false); }

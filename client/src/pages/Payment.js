@@ -120,10 +120,10 @@ const Payment = () => {
   }, [bookingId]);
 
   const handleCardPay = async () => {
-    if (!cardName)                    return alert("Please enter the cardholder name.");
-    if (cardNumber.replace(/\s/g,'').length < 16) return alert("Please enter a valid 16-digit card number.");
-    if (!expiry || expiry.length < 5) return alert("Please enter a valid expiry date.");
-    if (!cvv || cvv.length < 3)       return alert("Please enter a valid CVV.");
+    if (!cardName)     return alert("Please enter the cardholder name.");
+    if (!cardNumber)   return alert("Please enter a card number.");
+    if (!expiry)       return alert("Please enter an expiry date.");
+    if (!cvv)          return alert("Please enter a CVV.");
 
     setProcessing(true);
     try {
@@ -217,7 +217,7 @@ const Payment = () => {
             {method === 'cash'   ? 'Cash Payment' : ''}
           </h1>
           <p style={S.pageSubtitle}>
-            {isCard      ? 'Enter your card details securely.' : ''}
+            {isCard      ? 'Enter any card details to complete your demo booking.' : ''}
             {method === 'paypal' ? 'Log in with your PayPal account.' : ''}
             {method === 'cash'   ? 'Pay at the rental counter on pickup.' : ''}
           </p>

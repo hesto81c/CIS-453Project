@@ -1,8 +1,8 @@
-const express  = require("express");
-const router   = express.Router();
-const db       = require("../db.js");
+const express        = require("express");
+const router         = express.Router();
+const db             = require("../db.js");
 const { v4: uuidv4 } = require("uuid");
-const jwt      = require("jsonwebtoken");
+const jwt            = require("jsonwebtoken");
 
 // ── Auth middleware ───────────────────────────────────────────
 const requireAuth = (req, res, next) => {
@@ -24,11 +24,13 @@ router.get("/booked-dates/:vehicleId", async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT startDate, endDate FROM Bookings
-      WHERE vehicleId = ? AND status IN ('pending','confirmed','active')
+      WHERE vehicleId = ?
+        AND status IN ('pending','confirmed','active','reserved')
+        AND endDate >= CURDATE()
     `, [vehicleId]);
     res.json(rows);
   } catch (err) {
-    console.error("GET /booked-dates error:", err);
+    console.error("GET /booked-dates error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -38,29 +40,39 @@ router.get("/booked-dates/:vehicleId", async (req, res) => {
 // ─────────────────────────────────────────────────────────────
 router.get("/locations", async (req, res) => {
   try {
-    const [rows] = await db.query(`SELECT id, name, city, address FROM Locations ORDER BY city`);
+    const [rows] = await db.query(
+      `SELECT id, name, city, address FROM Locations ORDER BY city`
+    );
     res.json(rows);
   } catch (err) {
-    console.error("GET /locations error:", err);
+    console.error("GET /locations error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 // ─────────────────────────────────────────────────────────────
-//  GET /api/bookings/my-bookings  — user's booking history
+//  GET /api/bookings/my-bookings
 // ─────────────────────────────────────────────────────────────
 router.get("/my-bookings", requireAuth, async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT
-        b.id, b.confirmationNumber, b.startDate, b.endDate,
-        b.totalAmount, b.status, b.bookedAt, b.paymentMethod,
-        b.pickupTime, b.dropoffTime,
-        v.make, v.model, v.year, v.category,
+        b.id,
+        b.confirmationNumber,
+        b.startDate,
+        b.endDate,
+        b.totalAmount,
+        b.status,
+        b.bookedAt,
+        v.make,
+        v.model,
+        v.year,
+        v.category,
         vi.imageUrl,
         pl.name  AS pickupLocation,
         dl.name  AS dropoffLocation,
-        p.status AS paymentStatus, p.transactionId
+        p.status AS paymentStatus,
+        p.transactionId
       FROM Bookings b
       LEFT JOIN Vehicles      v  ON b.vehicleId         = v.id
       LEFT JOIN VehicleImages vi ON vi.vehicleId        = v.id AND vi.isPrimary = 1
@@ -72,13 +84,13 @@ router.get("/my-bookings", requireAuth, async (req, res) => {
     `, [req.user.id]);
     res.json(rows);
   } catch (err) {
-    console.error("GET /my-bookings error:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("GET /my-bookings error:", err.message);
+    res.status(500).json({ error: "Internal Server Error", detail: err.message });
   }
 });
 
 // ─────────────────────────────────────────────────────────────
-//  POST /api/bookings/:id/cancel  — cancel a booking
+//  POST /api/bookings/:id/cancel
 // ─────────────────────────────────────────────────────────────
 router.post("/:id/cancel", requireAuth, async (req, res) => {
   const { id } = req.params;
@@ -86,37 +98,34 @@ router.post("/:id/cancel", requireAuth, async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // Verify booking belongs to user and is cancellable
     const [rows] = await connection.query(
       `SELECT id, vehicleId, status, startDate FROM Bookings WHERE id = ? AND userId = ?`,
       [id, req.user.id]
     );
 
-    if (rows.length === 0)
+    if (rows.length === 0) {
+      await connection.rollback();
       return res.status(404).json({ error: "Booking not found." });
+    }
 
     const booking = rows[0];
 
-    if (!['pending','confirmed'].includes(booking.status))
+    if (!['pending', 'confirmed'].includes(booking.status)) {
+      await connection.rollback();
       return res.status(400).json({ error: "This booking cannot be cancelled." });
+    }
 
-    // Don't allow cancellation if trip already started
     if (new Date(booking.startDate) <= new Date()) {
       await connection.rollback();
       return res.status(400).json({ error: "Cannot cancel a booking that has already started." });
     }
 
-    // Cancel booking
     await connection.query(
       `UPDATE Bookings SET status = 'cancelled' WHERE id = ?`, [id]
     );
-
-    // Cancel payment
     await connection.query(
       `UPDATE Payments SET status = 'cancelled' WHERE bookingId = ?`, [id]
     );
-
-    // Free the vehicle back to available
     await connection.query(
       `UPDATE Vehicles SET status = 'available' WHERE id = ?`, [booking.vehicleId]
     );
@@ -126,7 +135,7 @@ router.post("/:id/cancel", requireAuth, async (req, res) => {
 
   } catch (err) {
     await connection.rollback();
-    console.error("POST /cancel error:", err);
+    console.error("POST /cancel error:", err.message);
     res.status(500).json({ error: "Failed to cancel booking." });
   } finally {
     connection.release();
@@ -143,7 +152,8 @@ router.post("/", async (req, res) => {
     pickupLocationId, dropoffLocationId,
     pickupTime, dropoffTime,
     totalAmount, paymentMethod,
-    driverName, driverLicense, driverPhone, notes
+    driverFirst, driverLast, driverLicense, driverPhone, driverEmail,
+    guestAddress, guestSSN4, isGuest, notes
   } = req.body;
 
   if (!vehicleId || !startDate || !endDate || !totalAmount || !paymentMethod)
@@ -156,7 +166,8 @@ router.post("/", async (req, res) => {
     // Conflict check
     const [conflicts] = await connection.query(`
       SELECT id FROM Bookings
-      WHERE vehicleId = ? AND status IN ('pending','confirmed','active')
+      WHERE vehicleId = ?
+        AND status IN ('pending','confirmed','active')
         AND NOT (endDate < ? OR startDate > ?)
     `, [vehicleId, startDate, endDate]);
 
@@ -171,15 +182,23 @@ router.post("/", async (req, res) => {
 
     await connection.query(`
       INSERT INTO Bookings (
-        id, userId, vehicleId, pickupLocationId, dropoffLocationId,
+        id, userId, vehicleId,
+        pickupLocationId, dropoffLocationId,
         startDate, endDate, pickupTime, dropoffTime,
         totalAmount, status, confirmationNumber, notes, bookedAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, NOW())
     `, [
-      bookingId, userId || 'guest', vehicleId,
-      pickupLocationId || null, dropoffLocationId || null,
-      startDate, endDate, pickupTime || null, dropoffTime || null,
-      totalAmount, confirmationNumber, notes || null
+      bookingId,
+      userId || null,
+      vehicleId,
+      pickupLocationId || null,
+      dropoffLocationId || null,
+      startDate, endDate,
+      pickupTime  || null,
+      dropoffTime || null,
+      totalAmount,
+      confirmationNumber,
+      notes || null
     ]);
 
     await connection.query(`
@@ -192,13 +211,12 @@ router.post("/", async (req, res) => {
     );
 
     await connection.commit();
-
     res.status(201).json({ message: "Booking created successfully!", bookingId, confirmationNumber });
 
   } catch (err) {
     await connection.rollback();
-    console.error("POST /api/bookings error:", err);
-    res.status(500).json({ error: "Failed to create booking." });
+    console.error("POST /api/bookings error:", err.message);
+    res.status(500).json({ error: "Failed to create booking.", detail: err.message });
   } finally {
     connection.release();
   }
