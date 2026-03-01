@@ -9,6 +9,8 @@ import AdminLogin from './pages/AdminLogin';
 import AdminFleet from './pages/AdminFleet';
 import Profile from './pages/Profile';
 import ResetPassword from './pages/ResetPassword';
+import NotFound from './pages/NotFound';
+import Terms from './pages/Terms';
 import './theme.css';
 
 const AppLayout = ({ children }) => {
@@ -120,6 +122,17 @@ const AppLayout = ({ children }) => {
       <main style={{ minHeight: isAdmin ? '100vh' : 'calc(100vh - 70px)', background: '#050508' }}>
         {children}
       </main>
+      {!isAdmin && (
+        <footer style={{ background: '#050508', borderTop: '1px solid #1e1e2e', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: '#2a2a3e', fontSize: '11px', letterSpacing: '2px', fontFamily: "'Montserrat',sans-serif" }}>© 2026 RENTAL 10 · SYRACUSE, NY</span>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <Link to="/terms" style={{ color: '#6a7080', fontSize: '11px', letterSpacing: '2px', textDecoration: 'none', fontFamily: "'Montserrat',sans-serif", transition: 'color .2s' }}
+              onMouseEnter={e => e.target.style.color = '#9b1c31'}
+              onMouseLeave={e => e.target.style.color = '#6a7080'}
+            >TERMS & CONDITIONS</Link>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
@@ -139,7 +152,9 @@ function App() {
           <Route path="/payment/:bookingId" element={<Payment />} />
           <Route path="/admin/login"        element={<AdminLogin />} />
           <Route path="/admin/fleet"        element={<AdminFleet />} />
+          <Route path="/terms"              element={<Terms />} />
           <Route path="/"                   element={<Catalog />} />
+          <Route path="*"                   element={<NotFound />} />
         </Routes>
       </AppLayout>
     </Router>
